@@ -10,7 +10,7 @@ app.use(Express.json());
 app.use("/user", controllers.userController);
 
 app.use(require("./middleware/validate-jwt"));
-app.use("/playlist", controllers.playlistController);
+app.use("/favorites", controllers.favoritesController);
 
 dbConnection.authenticate()
     .then(() => dbConnection.sync())
