@@ -1,7 +1,15 @@
 const UserModel = require("./user");
-const FavoritesModel = require("./favorites");
+const MovieModel = require("./movie");
+const NoteModel = require("./note");
 
-module.exports = { 
-    UserModel,
-    FavoritesModel
- };
+UserModel.hasMany(MovieModel);
+MovieModel.belongsTo(UserModel);
+
+UserModel.hasMany(NoteModel);
+NoteModel.belongsTo(UserModel);
+
+module.exports = {
+   UserModel,
+   MovieModel,
+   NoteModel,
+};

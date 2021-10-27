@@ -5,12 +5,14 @@ const dbConnection = require("./db");
 
 const controllers = require("./controllers");
 
+app.use(require("./middleware/headers"));
+// app.use(require("./middleware/validate-jwt"));
+
 app.use(Express.json());
 
-app.use("/user", controllers.userController);
-
-app.use(require("./middleware/validate-jwt"));
-app.use("/favorites", controllers.favoritesController);
+app.use("/user", controllers.User);
+app.use("/note", controllers.Note);
+app.use("/movie", controllers.Movie);
 
 dbConnection.authenticate()
     .then(() => dbConnection.sync())
@@ -21,4 +23,4 @@ dbConnection.authenticate()
     })
     .catch((err) => {
         console.log(`[Server]: Server crashed. Error = ${err}`);
-    });
+    })

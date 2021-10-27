@@ -1,11 +1,22 @@
-const router = require("express").Router();
+const { Router } = require("express");
 const { UserModel } = require("../models");
-const { UniqueConstraintError } = require("sequelize/lib/errors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { UniqueConstraintError } = require("sequelize/lib/errors");
 
-router.post("/register", async (req, res) => {
+const router = Router();
+router.get('/get', function (req, res) {
+    User.findAll({ where: { id: 1 }, include: ['movie'] }).then(
+        function findOneSuccess(data) {
+            res.json(data);
+        },
+        function findOneError(err) {
+            res.send(500, err.message);
+        }
+    );
+});
 
+router.post("/signup", async (req, res) => {
     let { email, password } = req.body.user;
     try {
         const User = await UserModel.create({
@@ -13,10 +24,10 @@ router.post("/register", async (req, res) => {
             password: bcrypt.hashSync(password, 13),
         });
 
-        let token = jwt.sign({ id: User.id, email: User.email }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 });
+        let token = jwt.sign({ id: User.id }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 });
 
         res.status(201).json({
-            message: "User successfully registered",
+            message: "The user has been successfully registered",
             user: User,
             sessionToken: token
         });
@@ -37,7 +48,7 @@ router.post("/login", async (req, res) => {
     let { email, password } = req.body.user;
 
     try {
-        const loginUser = await UserModel.findOne({
+        let loginUser = await UserModel.findOne({
             where: {
                 email: email,
             },
@@ -49,11 +60,11 @@ router.post("/login", async (req, res) => {
 
             if (passwordComparison) {
 
-                let token = jwt.sign({ id: loginUser.id }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 });
+                let token = jwt.sign({ id: loginUser.id }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 2 });
 
                 res.status(200).json({
                     user: loginUser,
-                    message: "User successfully logged in!",
+                    message: "User logged in!",
                     sessionToken: token
                 });
             } else {
